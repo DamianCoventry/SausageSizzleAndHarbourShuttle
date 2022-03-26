@@ -28,9 +28,9 @@ public class SausagePeddlers {
     public void goHome() throws InterruptedException {
         int totalSausages = 0;
         for (var bbq : _barbecues) {
-            bbq.switchOffGas();                           // <-- synchronized
+            bbq.switchOffGas();                         // <-- synchronized
             bbq.join();
-            totalSausages += bbq.getNumSausages();
+            totalSausages += bbq.getNumSausages();      // <-- synchronized
         }
         System.out.println("There are " + totalSausages + " sausages remaining.");
     }

@@ -22,22 +22,23 @@ public class Customer implements Runnable {
     private final CountDownLatch _served;
     private final Barbecue[] _barbecues;
     private final int _id;
-    private final int _numSausages;
+    private int _numSausages;
+    private int _currentBbq;
 
     public Customer(CountDownLatch served, int id, Barbecue[] barbecues) {
         _served = served;
         _id = id;
+        _currentBbq = 0;
         _barbecues = barbecues;
         _numSausages = chooseNumSausages();
     }
 
     @Override
     public void run() {
-        boolean bought = false;
         try {
-            while (!bought) {
-                for (int i = 0; i < _barbecues.length && !bought; ++i) {
-                    bought = _barbecues[i].buyNumSausages(_numSausages);            // <-- synchronized
+            while (_numSausages > 0) {
+                if (!buySausage()) {
+                    tryNextBbq();
                 }
                 waitPatiently();
             }
@@ -46,14 +47,22 @@ public class Customer implements Runnable {
             e.printStackTrace();
         }
         finally {
-            if (bought) {
-                System.out.println("Customer " + _id + " buys " + _numSausages + " sausages");
-            }
-            else {
-                System.out.println("Customer " + _id + " was interrupted, so walked away");
-            }
+            System.out.println("Customer " + _id + " has finished buying sausages");
             _served.countDown();
         }
+    }
+
+    private boolean buySausage() {
+        boolean bought =_barbecues[_currentBbq].buyOneSausage();
+        if (bought) {
+            --_numSausages;
+            System.out.println("Customer " + _id + " bought a sausage from Barbecue " + _currentBbq);
+        }
+        return bought;
+    }
+
+    private void tryNextBbq() {
+        _currentBbq = (++_currentBbq % _barbecues.length);
     }
 
     private int chooseNumSausages() {

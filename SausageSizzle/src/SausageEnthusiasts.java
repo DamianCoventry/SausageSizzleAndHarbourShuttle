@@ -21,6 +21,7 @@ public class SausageEnthusiasts {
 
         for (int i = 0; i < NUM_CUSTOMERS; ++i) {
             Thread customer = new Thread(new Customer(_served, i, barbecues));
+            customer.setName("Customer" + i);
             customer.start();
         }
     }

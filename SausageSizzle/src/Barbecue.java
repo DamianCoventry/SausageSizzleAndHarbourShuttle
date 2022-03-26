@@ -1,5 +1,3 @@
-import java.util.Random;
-
 /**
  * Designed and written by Damian Coventry
  * Copyright (c) 2022, all rights reserved
@@ -10,6 +8,8 @@ import java.util.Random;
  * 2022 Semester 1
  *
  */
+
+import java.util.Random;
 
 public class Barbecue extends Thread {
     static private final int MIN_COOKING_TIME = 150;
@@ -23,11 +23,12 @@ public class Barbecue extends Thread {
     public Barbecue(int id) {
         _id = id;
         _switchOffGas = false;
-        System.out.println("Barbecue " + _id + " started");
+        setName("BBQ" + _id);
     }
 
     @Override
     public void run() {
+        System.out.println("Barbecue " + _id + " started");
         try {
             while (!mustSwitchOffGas()) {
                 cookSausage();
@@ -58,9 +59,9 @@ public class Barbecue extends Thread {
 
     // Protect the _totalSausages variable.
 
-    synchronized public boolean buyNumSausages(int count) {
-        if (_totalSausages >= count) {
-            _totalSausages -= count;
+    synchronized public boolean buyOneSausage() {
+        if (_totalSausages > 0) {
+            --_totalSausages;
             return true;
         }
         return false;
